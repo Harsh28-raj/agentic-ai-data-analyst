@@ -1,0 +1,12 @@
+{
+  "extraPaths": [
+    "C:\\Users\\harsh\\AppData\\Roaming\\Python\\Python314\\site-packages",
+    "C:\\Python314\\Lib\\site-packages",
+    "."
+  ],
+  "executionEnvironments": [
+    {
+      "root": "."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+.env
+__pycache__/
+.pytest_cache/
+*.pyc
+
+.streamlit/secrets.toml
+
+logs/
+data/
+*.pdf
+*.csv
+
+.vscode/
+.idea/
