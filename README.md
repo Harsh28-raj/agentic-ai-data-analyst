@@ -298,7 +298,7 @@ DataMind-AI/
 | Groq API Key | [console.groq.com](https://console.groq.com) |
 
 ```bash
-git clone https://github.com/Harsh28-raj/datamind-ai.git
+git clone https://github.com/Harsh28-raj/agentic-ai-data-analyst.git
 cd datamind-ai
 ```
 
