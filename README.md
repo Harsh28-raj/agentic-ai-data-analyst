@@ -299,7 +299,7 @@ DataMind-AI/
 
 ```bash
 git clone https://github.com/Harsh28-raj/agentic-ai-data-analyst.git
-cd datamind-ai
+cd agentic-ai-data-analyst
 ```
 
 ---
