@@ -31,7 +31,7 @@ def is_general_chat(query: str) -> bool:
     ]
 
     return any(query == phrase or query.startswith(phrase) for phrase in general_phrases)
-    
+
 # State Schema for LangGraph
 class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]
@@ -49,7 +49,7 @@ def create_agent_graph():
     api_key = settings.GROQ_API_KEY or os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY") or "your_groq_api_key_here"
     base_url = settings.GROQ_BASE_URL or os.getenv("GROQ_BASE_URL") or "https://api.groq.com/openai/v1"
     model_name = settings.MODEL_NAME or os.getenv("MODEL_NAME") or "llama-3.3-70b-versatile"
-    
+
     # 1. Initialize Groq LLM via ChatOpenAI
     llm = ChatOpenAI(
         model=model_name,
@@ -59,7 +59,6 @@ def create_agent_graph():
         streaming=True
     )
 
-
     # 2. Bind Tools
     llm_with_tools = llm.bind_tools(ALL_AGENT_TOOLS)
 
@@ -68,12 +67,12 @@ def create_agent_graph():
         """Core ReAct LLM Agent Node."""
         messages = state["messages"]
         session_id = state.get("session_id", "default")
-        
+
         # Inject System Prompt if not present
         if not messages or not isinstance(messages[0], SystemMessage):
             system_msg = SystemMessage(content=f"{AGENT_SYSTEM_PROMPT}\nActive Session ID: {session_id}")
             messages = [system_msg] + messages
- 
+
         logger.info(f"Agent Node invoking Groq LLM for session {session_id}")
         response = llm_with_tools.invoke(messages)
         return {"messages": [response]}
@@ -112,7 +111,6 @@ def run_agent_query(session_id: str, query: str) -> Dict[str, Any]:
     }
 
     logger.info(f"Running agent query for session '{session_id}': '{query}'")
-
 
     reasoning_text = f"Analyzed dataset using ReAct reasoning loop to answer: '{query}'."
     chart_spec = None
@@ -153,10 +151,10 @@ def run_agent_query(session_id: str, query: str) -> Dict[str, Any]:
     if not reasoning_text:
         reasoning_text = f"Selected tools to inspect session '{session_id}' schema, compute relevant aggregates, and format output."
 
-logger.info("=" * 60)
-logger.info(f"FINAL AI MESSAGE: {repr(last_ai_message)}")
-logger.info(f"REASONING: {repr(reasoning_text)}")
-logger.info("=" * 60)    
+    logger.info("=" * 60)
+    logger.info(f"FINAL AI MESSAGE: {repr(last_ai_message)}")
+    logger.info(f"REASONING: {repr(reasoning_text)}")
+    logger.info("=" * 60)
 
     return {
         "text": last_ai_message,
