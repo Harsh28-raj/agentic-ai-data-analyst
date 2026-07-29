@@ -42,22 +42,48 @@ def post_chat(session_id: str, query: str) -> Dict[str, Any]:
 def stream_chat(session_id: str, query: str):
     """Generator function that streams tokens from backend /chat/stream SSE endpoint."""
     url = f"{BACKEND_URL}/chat/stream"
-    payload = {"session_id": session_id, "query": query}
+    payload = {
+        "session_id": session_id,
+        "query": query
+    }
+
     try:
-        with requests.post(url, json=payload, stream=True, timeout=120) as response:
+        with requests.post(
+            url,
+            json=payload,
+            stream=True,
+            timeout=180
+        ) as response:
+
             response.raise_for_status()
-            for line in response.iter_lines():
-                if line:
-                    decoded_line = line.decode("utf-8")
-                    if decoded_line.startswith("data: "):
-                        data_str = decoded_line[6:]
-                        try:
-                            chunk = json.loads(data_str)
-                            yield chunk
-                        except Exception:
-                            continue
+
+            for line in response.iter_lines(decode_unicode=True):
+
+                if not line:
+                    continue
+
+                if not line.startswith("data:"):
+                    continue
+
+                data = line[5:].strip()
+
+                try:
+                    chunk = json.loads(data)
+                    yield chunk
+
+                except json.JSONDecodeError:
+                    import ast
+                    try:
+                        chunk = ast.literal_eval(data)
+                        yield chunk
+                    except Exception:
+                        continue
+
     except Exception as e:
-        yield {"type": "error", "content": str(e)}
+        yield {
+            "type": "error",
+            "content": str(e)
+        }
 
 
 def get_anomalies(session_id: str, table_name: Optional[str] = None) -> Dict[str, Any]:
