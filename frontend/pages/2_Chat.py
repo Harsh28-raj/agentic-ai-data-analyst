@@ -233,7 +233,7 @@ for idx, message in enumerate(st.session_state.chat_messages):
                             print(f"DEBUG EXPORT: SQL count: {sql_count}, Charts count: {chart_count}")
                             
                             pdf_bytes = generate_pdf_report(f"DataMind AI Analysis", blocks)
-                            st.download_button("📑 Download PDF Report", data=pdf_bytes, file_name=f"analysis_{idx}.pdf", mime="application/pdf", key=f"dl_pdf_{idx}")
+                            st.download_button("📑 Download PDF Report", data=pdf_bytes, file_name="analysis.pdf", mime="application/pdf", key="dl_pdf_current")
                     except Exception as e:
                         st.error(f"PDF Export Error: {e}")
 
@@ -435,11 +435,9 @@ if prompt:
             assistant_entry = {
                 "role": "assistant",
                 "content": full_response,
-                "answer": full_response,
-                "question": st.session_state.chat_messages[-2]["content"] if len(st.session_state.chat_messages) >= 2 else "",
-                "sql": sql_code,
                 "reasoning": reasoning_text,
                 "chart_spec": chart_spec,
+                "sql_code": sql_code,
                 "pandas_code": pandas_code,
                 "timestamp": datetime.utcnow().isoformat()
             }
