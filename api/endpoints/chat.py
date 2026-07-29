@@ -53,7 +53,10 @@ async def chat_stream(request: ChatRequest):
 
     async def event_generator():
         try:
-            yield f"data: {{'type': 'reasoning', 'content': 'Analyzing request: {request.query}'}}\\n\\n"
+            yield "data: " + json.dumps({
+                "type": "reasoning",
+                "content": f"Analyzing request: {request.query}"
+            }) + "\n\n"
             await asyncio.sleep(0.05)
             agent_result = await asyncio.to_thread(run_agent_query, request.session_id, request.query)
 
