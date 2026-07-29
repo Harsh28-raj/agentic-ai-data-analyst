@@ -59,6 +59,7 @@ async def chat_stream(request: ChatRequest):
             }) + "\n\n"
             await asyncio.sleep(0.05)
             agent_result = await asyncio.to_thread(run_agent_query, request.session_id, request.query)
+            logger.info(f"STREAM RESULT: {agent_result}")
 
             tokens = agent_result["text"].split(" ")
             for token in tokens:
