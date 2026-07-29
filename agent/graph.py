@@ -113,37 +113,6 @@ def run_agent_query(session_id: str, query: str) -> Dict[str, Any]:
 
     logger.info(f"Running agent query for session '{session_id}': '{query}'")
 
-    if is_general_chat(query):
-
-    response = ChatOpenAI(
-        model=settings.MODEL_NAME,
-        api_key=settings.GROQ_API_KEY,
-        base_url=settings.GROQ_BASE_URL,
-        temperature=0.7
-    ).invoke([
-        SystemMessage(
-            content="""
-You are DataMind AI.
-
-You are an AI Data Analyst.
-
-Answer general conversation naturally.
-
-Do NOT call SQL tools.
-
-Keep replies short and friendly.
-"""
-        ),
-        HumanMessage(content=query)
-    ])
-
-    return {
-        "text": response.content,
-        "reasoning": "General conversation.",
-        "chart_spec": None,
-        "sql_code": None,
-        "pandas_code": None
-    }
 
     reasoning_text = f"Analyzed dataset using ReAct reasoning loop to answer: '{query}'."
     chart_spec = None
