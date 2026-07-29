@@ -51,53 +51,62 @@ async def chat_stream(request: ChatRequest):
     if not session:
         raise HTTPException(status_code=404, detail=f"Session '{request.session_id}' not found.")
 
-    async def event_generator():
-        try:
-            yield "data: " + json.dumps({
-                "type": "reasoning",
-                "content": f"Analyzing request: {request.query}"
-            }) + "\n\n"
-            await asyncio.sleep(0.05)
-            agent_result = await asyncio.to_thread(run_agent_query, request.session_id, request.query)
-            logger.info(f"STREAM RESULT: {agent_result}")
+async def event_generator():
+    try:
+        yield "data: " + json.dumps({
+            "type": "reasoning",
+            "content": f"Analyzing request: {request.query}"
+        }) + "\n\n"
 
-            tokens = agent_result["text"].split(" ")
-            for token in tokens:
-                yield "data: " + json.dumps({
-                    "type": "token",
-                    "content": token + " "
-                }) + "\n\n"
-                await asyncio.sleep(0.02)
+        await asyncio.sleep(0.05)
 
-            if agent_result.get("chart_spec"):
-                yield "data: " + json.dumps({
-                    "type": "chart",
-                    "data": agent_result["chart_spec"]
-                }) + "\n\n"
-            
-            if agent_result.get("sql_code"):
-                yield "data: " + json.dumps({
-                    "type": "sql",
-                    "content": agent_result["sql_code"]
-                }) + "\n\n"
-            
-            if agent_result.get("pandas_code"):
-                yield "data: " + json.dumps({
-                    "type": "pandas",
-                    "content": agent_result["pandas_code"]
-                }) + "\n\n"
-            
+        agent_result = await asyncio.to_thread(
+            run_agent_query,
+            request.session_id,
+            request.query
+        )
+
+        logger.info(f"STREAM RESULT: {agent_result}")
+
+        text = agent_result.get("text") or ""
+        tokens = text.split(" ")
+
+        for token in tokens:
             yield "data: " + json.dumps({
-                "type": "complete",
-                "reasoning": agent_result["reasoning"]
+                "type": "token",
+                "content": token + " "
             }) + "\n\n"
-            
-      except Exception as e:
-                logger.error(f"Stream error: {str(e)}")
-                yield "data: " + json.dumps({
-                    "type": "error",
-                    "content": str(e)
-                }) + "\n\n"
+            await asyncio.sleep(0.02)
+
+        if agent_result.get("chart_spec"):
+            yield "data: " + json.dumps({
+                "type": "chart",
+                "data": agent_result["chart_spec"]
+            }) + "\n\n"
+
+        if agent_result.get("sql_code"):
+            yield "data: " + json.dumps({
+                "type": "sql",
+                "content": agent_result["sql_code"]
+            }) + "\n\n"
+
+        if agent_result.get("pandas_code"):
+            yield "data: " + json.dumps({
+                "type": "pandas",
+                "content": agent_result["pandas_code"]
+            }) + "\n\n"
+
+        yield "data: " + json.dumps({
+            "type": "complete",
+            "reasoning": agent_result["reasoning"]
+        }) + "\n\n"
+
+    except Exception as e:
+        logger.error(f"Stream error: {str(e)}", exc_info=True)
+        yield "data: " + json.dumps({
+            "type": "error",
+            "content": str(e)
+        }) + "\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
