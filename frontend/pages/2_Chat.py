@@ -320,6 +320,7 @@ if prompt:
                     break
 
             # Final render without the blinking cursor
+            st.write("DEBUG full_response:", repr(full_response))
             message_placeholder.markdown(full_response)
             
             # Show reasoning
@@ -432,6 +433,7 @@ if prompt:
 
             # Store assistant turn
             from datetime import datetime
+            st.write("DEBUG assistant:", repr(full_response))
             assistant_entry = {
                 "role": "assistant",
                 "content": full_response,
