@@ -153,6 +153,11 @@ def run_agent_query(session_id: str, query: str) -> Dict[str, Any]:
     if not reasoning_text:
         reasoning_text = f"Selected tools to inspect session '{session_id}' schema, compute relevant aggregates, and format output."
 
+logger.info("=" * 60)
+logger.info(f"FINAL AI MESSAGE: {repr(last_ai_message)}")
+logger.info(f"REASONING: {repr(reasoning_text)}")
+logger.info("=" * 60)    
+
     return {
         "text": last_ai_message,
         "reasoning": reasoning_text,
